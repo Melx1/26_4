@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <vector>
 #include <random>
+#include <sstream>
 
 class Track {
     std::string name;
@@ -46,12 +47,19 @@ public:
 class Player {
     std::vector<Track> listTrack;
     unsigned int currentTrackNumber = 0;
-
-public:
     bool isEmpty = true;
     bool isPlaying = false;
     bool isPause = false;
 
+    void setCurrentTrack (unsigned int newTrackNumber) {
+        currentTrackNumber = newTrackNumber;
+    }
+
+    unsigned int getCurrentTrack () {
+        return currentTrackNumber;
+    }
+
+public:
     void addTrack (const std::string & name, const std::string & createDate, const int & duration) {
         listTrack.emplace_back(name, createDate, duration);
         isEmpty = false;
@@ -81,7 +89,7 @@ public:
         }
     }
 
-    void playTrack (const int & idx) {
+    void next (const int & idx) {
         if (isEmpty) {
             std::cout << "Play list is empty" << std::endl;
             isPlaying = false;
@@ -96,12 +104,30 @@ public:
         isPlaying = false;
    }
 
-    unsigned int getCurrentTrack () {
-        return currentTrackNumber;
+    bool getIsEmpty () {
+        return isEmpty;
     }
 
-    void setCurrentTrack (unsigned int newTrackNumber) {
-        currentTrackNumber = newTrackNumber;
+    bool getIsPlaying () {
+        return isPlaying;
+    }
+
+    bool getIsPause () {
+        return isPause;
+    }
+
+
+
+    void setIsEmpty (bool flag) {
+        isEmpty = flag;
+    }
+
+    void setIsPlaying (bool flag) {
+        isPlaying = flag;
+    }
+
+    void setIsPause (bool flag) {
+        isPause = flag;
     }
 
     unsigned int size () {
@@ -133,7 +159,7 @@ int main() {
         }
 
         if (command == "play") {
-            if (!myPlayer.isPlaying) {
+            if (!myPlayer.getIsPlaying()) {
                 std::string buffer;
                 while (true) {
                     std::cin.rdbuf()->pubsync();
@@ -148,23 +174,23 @@ int main() {
             }
         }
         else if (command == "pause"){
-            if (!myPlayer.isPause and myPlayer.isPlaying){
-                myPlayer.isPause = true;
+            if (!myPlayer.getIsPause() and myPlayer.getIsPlaying()){
+                myPlayer.setIsPause(true);
                 std::cout << "Playback paused" << std::endl;
             }
         }
         else if (command == "next"){
-            if (myPlayer.isEmpty) {
+            if (myPlayer.getIsEmpty()) {
                 std::cout << "Play list is empty" << std::endl;
                 continue;
             }
             std::uniform_int_distribution<int> distribution(0, myPlayer.size() - 1);
-            myPlayer.playTrack(distribution(randGenerator));
+            myPlayer.next(distribution(randGenerator));
         }
         else if (command == "stop") {
-            if (myPlayer.isPlaying) {
-                myPlayer.isPlaying = false;
-                myPlayer.isPause = false;
+            if (myPlayer.getIsPlaying()) {
+                myPlayer.setIsPlaying(false);
+                myPlayer.setIsPause(false);
                 std::cout << "Playback stopped" << std::endl;
             }
         }
